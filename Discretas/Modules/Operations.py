@@ -24,31 +24,30 @@ def RequestASet(id):
         except:
             pass
     try:
-        setDef=[]
-        ignore=False
-        i=0
+        setDef = []
+        ignore = False
+        i = 0
         while i < len(set):
             if set[i] == '(':
-                ignore=True
+                ignore = True
             elif set[i] == ')':
-                ignore=False
+                ignore = False
             elif set[i] == ',' and not ignore:
                 setDef.append(set[:i])
-                set=set[i+1:]
-                i=-1
+                set = set[i+1:]
+                i = -1
             elif i == len(set)-1:
                 setDef.append(set)
-            i+=1
+            i += 1
         return setDef
     except:
         print("Hubo un error en la entrada")
     return -1
 
 
-
 def Cartesian():
-    x=RequestASet("X")
-    y=RequestASet("Y")
+    x = RequestASet("X")
+    y = RequestASet("Y")
     lst = []
     for i in range(len(x)):
         for j in range(len(y)):
@@ -57,7 +56,7 @@ def Cartesian():
 
 
 def PowerSet():
-    fullset=RequestASet("1")
+    fullset = RequestASet("1")
     listsub = list(fullset)
     subsets = []
     for i in range(2**len(listsub)):
@@ -75,21 +74,4 @@ def PowerSet():
 
 
 if __name__ == "__main__":
-    """a1 = []
-    a2 = [1]
-    z = Cartesian(a1, a2)
-    print("Cartesian: ", z)
-    z = PowerSet(z)
-    print("Power Set: ", z)
-    print("Length: ", len(z))
-    print("-----------------------------------------------------")
-    a1 = PowerSet(a1)
-    print("Power Set a1: ", a1)
-    a2 = PowerSet(a2)
-    print("Power Set a2: ", a2)
-    z1 = Cartesian(a1, a2)
-    print("Cartesian: ", z1)
-    print("Length: ", len(z1))
-    print("-----------------------------------------------------")
-    print("z: ", len(z))
-    print("z1: ", len(z1))"""
+    pass
