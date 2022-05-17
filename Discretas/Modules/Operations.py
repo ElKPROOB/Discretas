@@ -1,7 +1,7 @@
 import os
-import pprint
 
 import readchar
+import pyperclip as clp
 
 
 def RequestASet(id):
@@ -15,6 +15,8 @@ def RequestASet(id):
             userInput = readchar.readkey()
             if userInput == "\r":
                 break
+            elif userInput == readchar.key.CTRL_V:
+                set += clp.paste()
             elif userInput == "\x08":
                 set = set[:-1]
             elif userInput == "\x1b":
@@ -23,36 +25,114 @@ def RequestASet(id):
                 set += userInput
         except:
             pass
-    try:
-        setDef = []
-        ignore = False
-        i = 0
-        while i < len(set):
-            if set[i] == '(':
-                ignore = True
-            elif set[i] == ')':
-                ignore = False
-            elif set[i] == ',' and not ignore:
-                setDef.append(set[:i])
-                set = set[i+1:]
+    # try:
+    set = set.replace(" ", "")
+    setDef = []
+    subs = []
+    ignore = 0
+    i = 0
+    while i < len(set):
+        if set[i] == '(' or set[i] == '{' or set[i] == '[':
+            if i == 0:
+                ignore += 1
+                subs.append([])
+                set = set[1:]
                 i = -1
-            elif i == len(set)-1:
-                setDef.append(set)
-            i += 1
-        return setDef
-    except:
-        print("Hubo un error en la entrada")
+        elif set[i] == ')' or set[i] == '}' or set[i] == ']':
+            if i > 0:
+                subs[ignore-1].append(set[:i])
+                set = set[i+1:]
+            if i == 0:
+                set = set[1:]
+            i = -1
+            if ignore == 1:
+                setDef.append(subs[ignore-1])
+            else:
+                subs[ignore-2].append(subs[ignore-1])
+            subs.pop()
+            ignore -= 1
+        elif set[i] == ',':
+            if i > 0:
+                if ignore == 0:
+                    setDef.append(set[:i])
+                    set = set[i+1:]
+                    i = -1
+                else:
+                    subs[ignore-1].append(set[:i])
+                    set = set[i+1:]
+                    i = -1
+            else:
+                set = set[1:]
+                i = -1
+        elif i == len(set)-1:
+            setDef.append(set)
+        i += 1
+    os.system("cls")
+    return setDef
+    # except:
+    #    print("Hubo un error en la entrada")
     return -1
 
 
+def PrintASet(lst, sub=False):
+    strR = ""
+    if len(lst) == 0:
+        #print("{}", end="")
+        return "{}"
+    if sub:
+        #print("(", end="")
+        strR = strR+"("
+    else:
+        #print("{", end="")
+        strR = strR+"{"
+    for element in range(len(lst)-1):
+        # print(type(element),end="")
+        if type(lst[element]) == list:
+            #PrintASet(lst[element], True)
+            strR = strR+PrintASet(lst[element], True)+", "
+            #print(", ", end="")
+        else:
+            #print(lst[element], end=", ")
+            strR = strR+str(lst[element])+", "
+    if type(lst[len(lst)-1]) == list:
+        #PrintASet(lst[len(lst)-1], True)
+        strR = strR+PrintASet(lst[len(lst)-1], True)
+    else:
+        #print(lst[len(lst)-1], end="")
+        strR = strR+str(lst[len(lst)-1])
+    if sub:
+        #print(")", end="")
+        strR = strR+")"
+    else:
+        # print("}")
+        strR = strR+"}"
+    clp.copy(strR[1:-1])
+    return strR
+
+
 def Cartesian():
-    x = RequestASet("X")
-    y = RequestASet("Y")
+    sets = input("¿Cuántos conjuntos desea operar?: ")
+    if sets == "":
+        sets = 2
+    else:
+        sets = int(sets)
+        if sets <= 0:
+            return 0
+    strR = "Conj1"
     lst = []
-    for i in range(len(x)):
-        for j in range(len(y)):
-            lst.append((x[i], y[j]))
-    print(lst)
+    lstSets = [RequestASet("1")]
+    for i in range(1, sets):
+        lstSets.append(RequestASet(str(i+1)))
+    x = lstSets[0]
+    for conj in range(1, sets):
+        y = lstSets[conj]
+        for i in range(len(x)):
+            for j in range(len(y)):
+                lst.append([x[i], y[j]])
+        strR = "("+strR+" X Conj"+str(conj+1)+")"
+        print("-> "+strR+": ", PrintASet(lst))
+        x = lst
+        lst = []
 
 
 def PowerSet():
@@ -70,7 +150,40 @@ def PowerSet():
         while len(subsets[j]) < len(subsets[j-1]) and j-1 > 0:
             subsets[j-1], subsets[j] = subsets[j], subsets[j-1]
             j -= 1
-    print(subsets)
+    print("P(Conj1): "+PrintASet(subsets))
+
+
+def SetsCardinality():
+    set = RequestASet("1")
+    print("|Conj1|: ", len(set))
+
+
+def Gcd():
+    print("MCD(a, b)")
+    a = int(input("Ingrese a -> "))
+    b = int(input("Ingrese b -> "))
+    print("\nMCD("+str(a)+", "+str(b)+") = ", end="")
+    if a < 0 or b < 0:
+        a = abs(a)
+        b = abs(b)
+        print("MCD("+str(a)+", "+str(b)+") = ", end="")
+    if a < b:
+        a, b = b, a
+        print("MCD("+str(a)+", "+str(b)+") = ", end="")
+    print("\n")
+    c = a % b
+    aL = len(str(a))
+    bL = len(str(b))
+    cL = len(str(c))
+    divL = len(str(int(a/b)))
+    print(str(a)+" "*(aL-len(str(a)))+" = "+str(b)+" "*(bL-len(str(b)))+"(" +
+          str(int(a/b))+" "*(divL-len(str((int(a/b)))))+") + "+str(c)+" "*(cL-len(str(c))))
+    while c != 0:
+        a, b = b, c
+        c = a % b
+        print(str(a)+" "*(aL-len(str(a)))+" = "+str(b)+" "*(bL-len(str(b)))+"(" +
+              str(int(a/b))+" "*(divL-len(str((int(a/b)))))+") + "+str(c)+" "*(cL-len(str(c))))
+    print("\nMCD(a, b) =", abs(b), end="")
 
 
 if __name__ == "__main__":

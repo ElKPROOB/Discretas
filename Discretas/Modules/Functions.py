@@ -1,19 +1,25 @@
+import os
 import csv
 
 from Modules.Operations import *
 
 
 def Execute(Id):
+    os.system("cls")
     if Id == "01":
         PowerSet()
     elif Id == "02":
         Cartesian()
+    elif Id == "03":
+        SetsCardinality()
+    elif Id == "04":
+        Gcd()
     input("\nPresione cualquier tecla para continuar...")
 
 
 def ReadCSV(route):
     dictionary = {}
-    csv.register_dialect('personal', delimiter=',',
+    csv.register_dialect('personal', delimiter=';',
                          quotechar='"', quoting=csv.QUOTE_ALL)
     with open(route) as csvfile:
         content = csv.reader(csvfile, dialect='personal')
@@ -29,14 +35,14 @@ def ReadCSV(route):
     return dictionary
 
 
-def ListOperations():
+"""def ListOperations():
     operationsDict = ReadCSV('Discretas/Files/Operations.csv')
     operations = ""
     for i in operationsDict.keys():
         operations += operationsDict[i][0] + ": " + \
             operationsDict[i][1] + " - " + \
             operationsDict[i][2] + "\n"
-    return operations
+    return operations"""
 
 
 def Suggestions(dictionary, suggestion, identifier, retLim_t, retElemID_t):
@@ -49,7 +55,11 @@ def Suggestions(dictionary, suggestion, identifier, retLim_t, retElemID_t):
                 if retElemID_t:
                     return key
                 suggestions += "->"
-            suggestions += key + ": " + value[0] + "\n"
+                suggestions += key + ": " + \
+                    value[0] + " - " + value[1] + " - " + value[2] + "\n"
+            else:
+                suggestions += "  "
+                suggestions += key + ": " + value[0] + " - " + value[1] + "\n"
             i += 1
     if retLim_t:
         return j

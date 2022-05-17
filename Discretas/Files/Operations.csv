@@ -1,3 +1,5 @@
-"ID", Title, Notation, Description
-"01", Conjunto Potencia, P(A), ConjPot1
-"02", Producto Cartesiano, AxB, ProdCart1
+"ID"; Title; Notation; Description
+"01"; Conjunto Potencia; "P(A)"; ConjPot1
+"02"; Producto Cartesiano; "AxB"; ProdCart1
+"03"; Cardinalidad de un Conjunto; "|A|"; Cardinalidad
+"04"; Maximo Comun Divisor; "(A,B)"; MaxComunDiv
