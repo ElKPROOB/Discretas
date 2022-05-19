@@ -2,6 +2,9 @@ import os
 
 import readchar
 import pyperclip as clp
+from numpy import ones
+
+primes = []
 
 
 def RequestASet(id):
@@ -110,6 +113,21 @@ def PrintASet(lst, sub=False):
     return strR
 
 
+def GeneratePrimes(num):
+    os.system("cls")
+    print("Espere mientras se generan los primos...")
+    global primes
+    primes = []
+    primesTmp = ones(num+1, dtype=int)
+    primesTmp[0] = primesTmp[1] = 0
+    for i in range(2, num+1):
+        if primesTmp[i] == 1:
+            primes.append(i)
+            for j in range(2*i, num+1, i):
+                primesTmp[j] = 0
+    os.system("cls")
+
+
 def Cartesian():
     sets = input("¿Cuántos conjuntos desea operar?: ")
     if sets == "":
@@ -186,5 +204,47 @@ def Gcd():
     print("\nMCD(a, b) =", abs(b), end="")
 
 
+def Decompose():
+    global primes
+    descomposicion = []
+    try:
+        a = input("Ingrese el numero que desea descomponer: ")
+        a = int(float(a))
+        a = abs(a)
+    except:
+        a = 0
+
+    a2 = str(a)
+    table=""
+    p = 1
+    q = 0
+    if a > 1:
+        GeneratePrimes(a)
+        cont=1
+        while q != 1:
+            for i in primes:
+                # print((int(a/i)==a/i))
+                # if ((i <= a) and (int(a/i) == a/i)):
+                if ((i <= a) and a % i == 0):
+                    table=table+(" "*(len(a2)-len(str(int(a))))+str(int(a))+"|"+str(i)+"\n")
+                    print(str(cont)+"-> "+"a = "+str(int(a))+", p = "+str(i)+", q = "+str(int(a/i)))
+                    p = i
+                    q = a/p
+                    descomposicion.append(str(p))
+                    a = q
+                    cont+=1
+                    break
+        table = table+(" "*(len(a2)-1)+"1"+"|"+"\n")
+        print("\n-------------------------\n")
+        print(table, end="")
+        print("\n-------------------------\n")
+        print(a2+" = ", end="")
+        for i in range(len(descomposicion)-1):
+            print(descomposicion[i]+"*", end="")
+        print(descomposicion[len(descomposicion)-1]+"\n")
+    else:
+        print("No es posible descomponer el numero que ingresaste")
+
+
 if __name__ == "__main__":
-    pass
+    Decompose()

@@ -14,6 +14,8 @@ def Execute(Id):
         SetsCardinality()
     elif Id == "04":
         Gcd()
+    elif Id == "05":
+        Decompose()
     input("\nPresione cualquier tecla para continuar...")
 
 

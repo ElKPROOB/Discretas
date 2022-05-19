@@ -1,5 +1,6 @@
 "ID"; Title; Notation; Description
-"01"; Conjunto Potencia; "P(A)"; ConjPot1
-"02"; Producto Cartesiano; "AxB"; ProdCart1
-"03"; Cardinalidad de un Conjunto; "|A|"; Cardinalidad
-"04"; Maximo Comun Divisor; "(A,B)"; MaxComunDiv
+"01"; Conjunto Potencia; "P(A)"; Devuelve el conjunto potencia de un conjunto dado.
+"02"; Producto Cartesiano; "AxB"; Devuelve el producto cartesiano de N conjuntos dados.
+"03"; Cardinalidad de un Conjunto; "|A|"; Devuelve la cardinalidad de un conjunto dado.
+"04"; Maximo Comun Divisor; "(A,B)"; Devuelve el MCD de dos numeros dados.
+"05"; Descomposicion de un numero en primos; "A=(p1*p2...)"; Devuelve una lista con los primos que componen un numero dado.
