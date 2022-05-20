@@ -1,131 +1,5 @@
-import os
-
-import readchar
-import pyperclip as clp
-from numpy import ones
-
-primes = []
-
-
-def RequestASet(id):
-    """Funcion auxiliar"""
-    set = ""
-    while True:
-        try:
-            os.system("cls")
-            print("Ingrese el conjunto " + id + ": {" + set + "}")
-            print("Ejemplo de conjunto: {{}, 2, (3, 4), A}")
-            userInput = readchar.readkey()
-            if userInput == "\r":
-                break
-            elif userInput == readchar.key.CTRL_V:
-                set += clp.paste()
-            elif userInput == "\x08":
-                set = set[:-1]
-            elif userInput == "\x1b":
-                return -1
-            elif ord(userInput) > 31 and ord(userInput) < 127:
-                set += userInput
-        except:
-            pass
-    # try:
-    set = set.replace(" ", "")
-    setDef = []
-    subs = []
-    ignore = 0
-    i = 0
-    while i < len(set):
-        if set[i] == '(' or set[i] == '{' or set[i] == '[':
-            if i == 0:
-                ignore += 1
-                subs.append([])
-                set = set[1:]
-                i = -1
-        elif set[i] == ')' or set[i] == '}' or set[i] == ']':
-            if i > 0:
-                subs[ignore-1].append(set[:i])
-                set = set[i+1:]
-            if i == 0:
-                set = set[1:]
-            i = -1
-            if ignore == 1:
-                setDef.append(subs[ignore-1])
-            else:
-                subs[ignore-2].append(subs[ignore-1])
-            subs.pop()
-            ignore -= 1
-        elif set[i] == ',':
-            if i > 0:
-                if ignore == 0:
-                    setDef.append(set[:i])
-                    set = set[i+1:]
-                    i = -1
-                else:
-                    subs[ignore-1].append(set[:i])
-                    set = set[i+1:]
-                    i = -1
-            else:
-                set = set[1:]
-                i = -1
-        elif i == len(set)-1:
-            setDef.append(set)
-        i += 1
-    os.system("cls")
-    return setDef
-    # except:
-    #    print("Hubo un error en la entrada")
-    return -1
-
-
-def PrintASet(lst, sub=False):
-    strR = ""
-    if len(lst) == 0:
-        #print("{}", end="")
-        return "{}"
-    if sub:
-        #print("(", end="")
-        strR = strR+"("
-    else:
-        #print("{", end="")
-        strR = strR+"{"
-    for element in range(len(lst)-1):
-        # print(type(element),end="")
-        if type(lst[element]) == list:
-            #PrintASet(lst[element], True)
-            strR = strR+PrintASet(lst[element], True)+", "
-            #print(", ", end="")
-        else:
-            #print(lst[element], end=", ")
-            strR = strR+str(lst[element])+", "
-    if type(lst[len(lst)-1]) == list:
-        #PrintASet(lst[len(lst)-1], True)
-        strR = strR+PrintASet(lst[len(lst)-1], True)
-    else:
-        #print(lst[len(lst)-1], end="")
-        strR = strR+str(lst[len(lst)-1])
-    if sub:
-        #print(")", end="")
-        strR = strR+")"
-    else:
-        # print("}")
-        strR = strR+"}"
-    clp.copy(strR[1:-1])
-    return strR
-
-
-def GeneratePrimes(num):
-    os.system("cls")
-    print("Espere mientras se generan los primos...")
-    global primes
-    primes = []
-    primesTmp = ones(num+1, dtype=int)
-    primesTmp[0] = primesTmp[1] = 0
-    for i in range(2, num+1):
-        if primesTmp[i] == 1:
-            primes.append(i)
-            for j in range(2*i, num+1, i):
-                primesTmp[j] = 0
-    os.system("cls")
+from Modules.AuxFunctions import *
+#from AuxFunctions import *
 
 
 def Cartesian():
@@ -205,7 +79,7 @@ def Gcd():
 
 
 def Decompose():
-    global primes
+    primes=[]
     descomposicion = []
     try:
         a = input("Ingrese el numero que desea descomponer: ")
@@ -215,24 +89,26 @@ def Decompose():
         a = 0
 
     a2 = str(a)
-    table=""
+    table = ""
     p = 1
     q = 0
     if a > 1:
-        GeneratePrimes(a)
-        cont=1
+        primes=GeneratePrimes(a)
+        cont = 1
         while q != 1:
             for i in primes:
                 # print((int(a/i)==a/i))
                 # if ((i <= a) and (int(a/i) == a/i)):
                 if ((i <= a) and a % i == 0):
-                    table=table+(" "*(len(a2)-len(str(int(a))))+str(int(a))+"|"+str(i)+"\n")
-                    print(str(cont)+"-> "+"a = "+str(int(a))+", p = "+str(i)+", q = "+str(int(a/i)))
+                    table = table+(" "*(len(a2)-len(str(int(a)))
+                                        )+str(int(a))+"|"+str(i)+"\n")
+                    print(str(cont)+"-> "+"a = "+str(int(a)) +
+                          ", p = "+str(i)+", q = "+str(int(a/i)))
                     p = i
                     q = a/p
                     descomposicion.append(str(p))
                     a = q
-                    cont+=1
+                    cont += 1
                     break
         table = table+(" "*(len(a2)-1)+"1"+"|"+"\n")
         print("\n-------------------------\n")
@@ -246,5 +122,21 @@ def Decompose():
         print("No es posible descomponer el numero que ingresaste")
 
 
+def BaseChangeGeneralAlgorythm():
+    number = input("Ingresa el número a cambiar de base -> ")
+    numberRes = number
+    base = input("Ingresa la base del número original -> ")
+    base2 = input("Ingresa la base a la que lo quieres cambiar -> ")
+    print("\n", end="")
+    if base != "10":
+        print("\nConversión de base "+str(base)+" a base 10:\n")
+        numberRes = BaseChangeToTenAlgorythm(numberRes, int(base))
+    if base2 != "10":
+        print("\nConversión de base 10 a base "+str(base2)+":\n")
+        numberRes = BaseChangeAlgorythm(numberRes, int(base2))
+    print("\n")
+    print(str(number)+ObtainSub(base)+" = "+str(numberRes)+ObtainSub(base2))
+
+
 if __name__ == "__main__":
-    Decompose()
+    pass

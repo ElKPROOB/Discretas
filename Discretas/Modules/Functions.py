@@ -16,6 +16,8 @@ def Execute(Id):
         Gcd()
     elif Id == "05":
         Decompose()
+    elif Id=="06":
+        BaseChangeGeneralAlgorythm()
     input("\nPresione cualquier tecla para continuar...")
 
 
@@ -35,16 +37,6 @@ def ReadCSV(route):
                 dictionary[aux] = lst[1:]
     csvfile.close()
     return dictionary
-
-
-"""def ListOperations():
-    operationsDict = ReadCSV('Discretas/Files/Operations.csv')
-    operations = ""
-    for i in operationsDict.keys():
-        operations += operationsDict[i][0] + ": " + \
-            operationsDict[i][1] + " - " + \
-            operationsDict[i][2] + "\n"
-    return operations"""
 
 
 def Suggestions(dictionary, suggestion, identifier, retLim_t, retElemID_t):
