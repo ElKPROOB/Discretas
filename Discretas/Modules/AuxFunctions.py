@@ -5,27 +5,83 @@ import readchar
 import pyperclip as clp
 from numpy import ones
 
+
+def AuxRequestData(str, index=0):
+    index2 = len(str)+index
+    try:
+        code = 0
+        userInput = readchar.readkey()
+        if userInput == "\r":
+            code = 1
+        elif userInput == "\x08":
+            str2 = str[:index2]
+            str2 = str2[:-1]
+            str = str2+str[index2:]
+        elif userInput == "\x1b":
+            code = -1
+        elif userInput == readchar.key.LEFT:
+            if index2 > 0:
+                index -= 1
+        elif userInput == readchar.key.RIGHT:
+            if index2 < len(str):
+                index += 1
+        elif userInput == readchar.key.CTRL_V:
+            str += clp.paste()
+        elif ord(userInput) > 31 and ord(userInput) < 127:
+            str = str[:index2] + userInput + str[index2:]
+        return code, str, index
+    except:
+        return -2, str, index
+
+
+def AuxIterateRequestData(msg="", postMsg=""):
+    code = 0
+    index = 0
+    enter = False
+    var = ""
+    while True:
+        os.system("cls")
+        if enter:
+            print(
+                msg + "(Aún no has escrito nada, presiona ENTER de nuevo para continuar)" + postMsg)
+        elif index == 0:
+            print(msg + var + postMsg)
+        else:
+            print(msg+var[:len(var)+index] + "|" + var[len(var)+index:])
+        code, var, index = AuxRequestData(var, index)
+        if code == 1:
+            if var == "":
+                if enter:
+                    break
+                else:
+                    enter = True
+            else:
+                break
+        elif code == -1:
+            return -1
+        else:
+            if enter:
+                enter = False
+    return var
+
+
 def RequestASet(id):
+    index = 0
+    code = 0
     set = ""
     while True:
-        try:
-            os.system("cls")
+        os.system("cls")
+        if index == 0:
             print("Ingrese el conjunto " + id + ": {" + set + "}")
-            print("Ejemplo de conjunto: {{}, 2, (3, 4), A}")
-            userInput = readchar.readkey()
-            if userInput == "\r":
-                break
-            elif userInput == readchar.key.CTRL_V:
-                set += clp.paste()
-            elif userInput == "\x08":
-                set = set[:-1]
-            elif userInput == "\x1b":
-                return -1
-            elif ord(userInput) > 31 and ord(userInput) < 127:
-                set += userInput
-        except:
-            pass
-    # try:
+        else:
+            print("Ingrese el conjunto " + id +
+                  ": {" + set[:len(set)+index] + "|" + set[len(set)+index:] + "}")
+        print("Ejemplo de conjunto: {{}, 2, (3, 4), A}")
+        code, set, index = AuxRequestData(set, index)
+        if code == 1:
+            break
+        elif code == -1:
+            return -1
     set = set.replace(" ", "")
     setDef = []
     subs = []
@@ -69,9 +125,7 @@ def RequestASet(id):
         i += 1
     os.system("cls")
     return setDef
-    # except:
-    #    print("Hubo un error en la entrada")
-    return -1
+
 
 def PrintASet(lst, sub=False):
     strR = ""
@@ -105,7 +159,6 @@ def PrintASet(lst, sub=False):
     else:
         # print("}")
         strR = strR+"}"
-    clp.copy(strR[1:-1])
     return strR
 
 
@@ -125,11 +178,17 @@ def GeneratePrimes(num):
     return primes
 
 
-def ObtainSub(number):
-    base = u'\u208D'
+def ObtainSub(number, parenthesis=True):
+    base=""
+    if parenthesis:
+        base = u'\u208D'
     for i in str(number):
-        base += '{}'.format(chr(0x2080+int(i)))
-    base += u'\u208E'
+        if i == ' ':
+            base += ' '
+        else:
+            base += '{}'.format(chr(0x2080+int(i)))
+    if parenthesis:
+        base += u'\u208E'
     return base
 
 
@@ -140,6 +199,8 @@ def ObtainSup(number):
             base += '{}'.format(chr(0x2070+int(i)))
         elif i == '1':
             base += '{}'.format(chr(0x00B9))
+        elif i == ' ':
+            base += ' '
         else:
             base += '{}'.format(chr(0x00B0+int(i)))
     return base
@@ -173,7 +234,7 @@ def BaseChangeToTenAlgorythm(number, base):
 def BaseChangeAlgorythm(number, base):
     q = 1
     res = []
-    number=int(number)
+    number = int(number)
     number2 = number
     nL = len(str(number))
     qL = len(str(int(number/base)))
@@ -195,3 +256,80 @@ def BaseChangeAlgorythm(number, base):
     print(finalNum, end="")
     print(ObtainSub(base))
     return finalNum
+
+
+def NumInBaseXToBaseTen(chr):
+    if type(chr) == int:
+        return chr
+    if ord(chr) >= 48 and ord(chr) <= 57:
+        return ord(chr)-48
+    elif ord(chr) >= 65 and ord(chr) <= 90:
+        return ord(chr)-55
+    else:
+        return -3
+
+
+def NumInBaseTenToBaseX(lst):
+    num = ""
+    for i in lst:
+        if i == "":
+            num += " "
+        elif int(i) < 10:
+            num += str(i)
+        else:
+            num += chr(int(i)+55)
+    return num
+
+
+def SumNumbers(lst, base):
+    if base < 2:
+        return -3
+    lst.sort(key=len, reverse=True)
+    maxL = len(lst[0])
+    resd = 0
+    sobr = 0
+    res = []
+    strResd = []
+    cantRes = 0
+    minCant = maxL+1
+    for i in range(maxL):
+        sum = 0
+        sum += resd
+        for j in range(len(lst)):
+            if len(lst[j])-(i+1) >= 0:
+                tmp = NumInBaseXToBaseTen(lst[j][len(lst[j])-(i+1)])
+                if tmp == -3:
+                    return -3
+                sum += int(tmp)
+        resd = int(sum/base)
+        if resd != 0:
+            strResd.append(str(resd))
+        else:
+            strResd.append("")
+        sobr = sum % base
+        res.append(str(sobr))
+        cantRes += 1
+    while int(resd/base) > 0:
+        sobr = resd % base
+        res.append(str(sobr))
+        cantRes += 1
+        resd = int(resd/base)
+        if resd != 0:
+            strResd.append(str(resd))
+        else:
+            strResd.append("")
+    if resd != 0:
+        res.append(str(resd))
+        cantRes += 1
+    if cantRes < minCant:
+        cantRes = minCant
+    strResd = strResd[::-1]
+    strResd = NumInBaseTenToBaseX(strResd)
+    strResd=ObtainSub(strResd, False)
+    for i in range(len(lst)):
+        strResd += "\n"+" "*(cantRes-len(lst[i]))+lst[i]+ObtainSub(base)
+    strResd += "\n"+"-"*(cantRes)
+    res = res[::-1]
+    res = NumInBaseTenToBaseX(res)
+    strResd += "\n"+" "*(cantRes-len(res))+res+ObtainSub(base)
+    return strResd, res

@@ -1,23 +1,72 @@
 import os
 import csv
 
+import readchar
+
 from Modules.Operations import *
+
+
+def RequestData(str,index=0):
+    index2=len(str)+index
+    try:
+        code = 0
+        userInput = readchar.readkey()
+        if userInput == "\r":
+            code = 1
+        elif userInput == "\x08":
+            str2=str[:index2]
+            str2=str2[:-1]
+            str=str2+str[index2:]
+        elif userInput == "\x1b":
+            code = -1
+        elif userInput == readchar.key.DOWN:
+            code = 2
+        elif userInput == readchar.key.UP:
+            code = 3
+        elif userInput == readchar.key.LEFT:
+            if index2>0:
+                index-=1
+        elif userInput == readchar.key.RIGHT:
+            if index2<len(str):
+                index+=1
+        elif userInput == readchar.key.CTRL_V:
+            str += clp.paste()
+        elif ord(userInput) > 31 and ord(userInput) < 127:
+            str = str[:index2] + userInput + str[index2:]
+        return code, str, index
+    except:
+        return -2, str, index
 
 
 def Execute(Id):
     os.system("cls")
     if Id == "01":
-        PowerSet()
+        strR=PowerSet()
+        if type(strR) == str:
+            strR=strR[1:-1]
     elif Id == "02":
-        Cartesian()
+        strR=Cartesian()
+        if type(strR) == str:
+            strR=strR[1:-1]
     elif Id == "03":
-        SetsCardinality()
+        strR=SetsCardinality()
     elif Id == "04":
-        Gcd()
+        strR=Gcd()
     elif Id == "05":
-        Decompose()
+        strR=Decompose()
     elif Id=="06":
-        BaseChangeGeneralAlgorythm()
+        strR=BaseChangeGeneralAlgorythm()
+    elif Id=="07":
+        strR = Sum()
+    if type(strR) == str:
+        clp.copy(strR)
+        print("\nResultado copiado al portapapeles\n\n")
+    elif strR==-1:
+        return -1
+    elif strR==-2:
+        print("\nError en la ejecución, comprueba que has introducido los datos correctamente\n\n")
+    elif strR==-3:
+        print("\nSe han detectado algunos errores en los datos ingresados\n\n")
     input("\nPresione cualquier tecla para continuar...")
 
 
@@ -55,6 +104,7 @@ def Suggestions(dictionary, suggestion, identifier, retLim_t, retElemID_t):
                 suggestions += "  "
                 suggestions += key + ": " + value[0] + " - " + value[1] + "\n"
             i += 1
+    suggestions+="  ESC: Salir\n"
     if retLim_t:
         return j
     return suggestions

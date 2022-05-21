@@ -5,3 +5,4 @@
 "04"; Maximo Comun Divisor; "(A,B)"; Devuelve el MCD de dos numeros dados.
 "05"; Descomposicion de un numero en primos; "A = (p1*p2...)"; Devuelve una lista con los primos que componen un numero dado.
 "06"; Cambio de base; "A(x) = B(y)"; Dado un numero A en base x, devuelve su equivalente en base y.
+"07"; Suma de numeros en otra base; "A(x) + B(x) = C(x)"; Devuelve la suma de N numeros dados en base x.
