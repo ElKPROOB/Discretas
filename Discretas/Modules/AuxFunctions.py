@@ -34,7 +34,7 @@ def AuxRequestData(str, index=0):
         return -2, str, index
 
 
-def AuxIterateRequestData(msg="", postMsg=""):
+def AuxIterateRequestData(msg="", postMsg="", mayus=False):
     code = 0
     index = 0
     enter = False
@@ -47,8 +47,11 @@ def AuxIterateRequestData(msg="", postMsg=""):
         elif index == 0:
             print(msg + var + postMsg)
         else:
-            print(msg+var[:len(var)+index] + "|" + var[len(var)+index:])
+            print(msg+var[:len(var) + index] + "|" +
+                  var[len(var)+index:] + postMsg)
         code, var, index = AuxRequestData(var, index)
+        if mayus:
+            var = var.upper()
         if code == 1:
             if var == "":
                 if enter:
@@ -179,12 +182,14 @@ def GeneratePrimes(num):
 
 
 def ObtainSub(number, parenthesis=True):
-    base=""
+    base = ""
     if parenthesis:
         base = u'\u208D'
     for i in str(number):
         if i == ' ':
             base += ' '
+        elif ord(i)>=65 and ord(i)<=90:
+            base += i
         else:
             base += '{}'.format(chr(0x2080+int(i)))
     if parenthesis:
@@ -201,6 +206,8 @@ def ObtainSup(number):
             base += '{}'.format(chr(0x00B9))
         elif i == ' ':
             base += ' '
+        elif ord(i)>=65 and ord(i)<=90:
+            base += i
         else:
             base += '{}'.format(chr(0x00B0+int(i)))
     return base
@@ -265,11 +272,13 @@ def NumInBaseXToBaseTen(chr):
         return ord(chr)-48
     elif ord(chr) >= 65 and ord(chr) <= 90:
         return ord(chr)-55
+    elif chr == ' ':
+        return 0
     else:
         return -3
 
 
-def NumInBaseTenToBaseX(lst):
+def NumInBaseTenToBaseX(lst, inverted=False):
     num = ""
     for i in lst:
         if i == "":
@@ -278,12 +287,16 @@ def NumInBaseTenToBaseX(lst):
             num += str(i)
         else:
             num += chr(int(i)+55)
+    if inverted:
+        num = num[::-1]
     return num
 
 
-def SumNumbers(lst, base):
+def SumNumbers(lst, base, productSum=False):
     if base < 2:
         return -3
+    if productSum:
+        lstTmp=lst.copy()
     lst.sort(key=len, reverse=True)
     maxL = len(lst[0])
     resd = 0
@@ -325,7 +338,9 @@ def SumNumbers(lst, base):
         cantRes = minCant
     strResd = strResd[::-1]
     strResd = NumInBaseTenToBaseX(strResd)
-    strResd=ObtainSub(strResd, False)
+    strResd = ObtainSub(strResd, False)
+    if productSum:
+        lst=lstTmp
     for i in range(len(lst)):
         strResd += "\n"+" "*(cantRes-len(lst[i]))+lst[i]+ObtainSub(base)
     strResd += "\n"+"-"*(cantRes)
@@ -333,3 +348,137 @@ def SumNumbers(lst, base):
     res = NumInBaseTenToBaseX(res)
     strResd += "\n"+" "*(cantRes-len(res))+res+ObtainSub(base)
     return strResd, res
+
+
+def SubtractNumbers(lst, base, negative=False):
+    if base < 2:
+        return -3
+    if len(lst[0]) < len(lst[1]):
+        lst[0], lst[1] = lst[1], lst[0]
+        negative = True
+    if len(lst[0]) > len(lst[1]):
+        lst[1] = "0"*(len(lst[0]) - len(lst[1])) + lst[1]
+    maxL = len(lst[0])
+    compl = 0
+    res = []
+    strResd = []
+    for i in range(maxL):
+        rest = 0
+        minu = NumInBaseXToBaseTen(lst[0][maxL-(i+1)])
+        if minu == -3:
+            return -3
+        minu = int(minu)
+        if len(lst[1])-(i+1) >= 0:
+            sustra = NumInBaseXToBaseTen(lst[1][len(lst[1])-(i+1)])
+            if sustra == -3:
+                return -3
+            sustra = int(sustra)
+            sustra += compl
+        else:
+            sustra = 0
+        if minu < sustra:
+            minu += base
+            if len(lst[1])-(i+2) >= 0:
+                compl = 1
+            else:
+                if negative:
+                    return "Error", "x"
+                else:
+                    return SubtractNumbers([lst[1], lst[0]], base, True)
+        else:
+            compl = 0
+        rest = minu - sustra
+        if compl != 0:
+            strResd.append(str(compl))
+        else:
+            strResd.append("")
+        res.append(str(rest))
+    strResd = strResd[::-1]
+    strResd = NumInBaseTenToBaseX(strResd)
+    strResd = ObtainSup(strResd)
+    strRes = ""
+    for i in range(len(lst[0])-1):
+        strRes += lst[0][i] + " "
+    strRes += lst[0][len(lst[0])-1] + ObtainSub(base)
+    strRes += "\n"
+    strRes += "  "*(len(lst[0])-len(lst[1]))
+    for i in range(len(lst[1])-1):
+        strRes += lst[1][i] + strResd[i+1]
+    strRes += lst[1][len(lst[1])-1] + ObtainSub(base)
+    strRes += "\n"+"-"*((maxL*2)-1)
+    if negative:
+        strRes += "-"
+    res = res[::-1]
+    res = NumInBaseTenToBaseX(res)
+    strRes += "\n"
+    res2 = ""
+    for i in range(len(res)-1):
+        res2 += res[i] + " "
+    res2 += res[len(res)-1] + ObtainSub(base)
+    strRes += res2
+    if negative:
+        strRes += " Debido a que Num1<Num2, se invirtieron los terminos, por lo que la resta es: -" + res2
+        res="-"+res
+    return strRes, res
+
+
+def MultiplyNumbers(lst, base):
+    if base < 2:
+        return -3
+    if len(lst[0]) < len(lst[1]):
+        lst[0], lst[1] = lst[1], lst[0]
+    maxL = len(lst[0])
+    sums = []
+    res = []
+    strResd = []
+    for i in range(len(lst[1])):
+        mult = 0
+        resd = 0
+        strResd.append([])
+        sums.append([])
+        termB = NumInBaseXToBaseTen(lst[1][len(lst[1])-(i+1)])
+        if termB == -3:
+            return -3
+        termB = int(termB)
+        for j in range(maxL):
+            termA = NumInBaseXToBaseTen(lst[0][len(lst[0])-(j+1)])
+            if termA == -3:
+                return -3
+            termA = int(termA)
+            mult = (termA*termB)+resd
+            sums[i].append(str(mult % base))
+            resd = mult//base
+            if resd != 0:
+                strResd[i].append(str(resd))
+            else:
+                strResd[i].append("")
+        if resd != 0:
+            sums[i].append(str(resd))
+    maxSL=0
+    for i in range(len(sums)):
+        sums[i] = NumInBaseTenToBaseX(sums[i], True)
+        sums[i] += " "*i
+        if len(sums[i]) > maxSL:
+            maxSL = len(sums[i])
+    maxRL=0
+    for i in range(len(strResd)):
+        strResd[i] = NumInBaseTenToBaseX(strResd[i], True)
+        strResd[i] += " "
+        strResd[i] = ObtainSub(strResd[i], False)
+        if len(strResd[i]) > maxRL:
+            maxRL = len(strResd[i])
+    maxT=max(maxSL, maxRL, maxL)
+    strRes = ""
+    j=0
+    for i in range(len(strResd)-1, -1, -1):
+        strRes += " "*(maxT-len(strResd[i]))+strResd[i] + \
+            " <- residuos del termino \""+lst[1][j]+"\"\n"
+        j+=1
+    strRes += " "*(maxT-maxL)+lst[0] + ObtainSub(base) + "\n"
+    strRes += " "*(maxT-len(lst[1]))+lst[1] + ObtainSub(base)+"\n"
+    strRes += "-"*(maxT)+"\n"
+    strRes2, res=SumNumbers(sums, base, True)
+    if res == -3:
+        return -3
+    strRes += strRes2
+    return strRes, res

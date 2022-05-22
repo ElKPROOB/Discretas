@@ -1,4 +1,3 @@
-from re import L
 from Modules.AuxFunctions import *
 #from AuxFunctions import *
 
@@ -138,7 +137,7 @@ def Decompose():
         print(table, end="")
         print("\n-------------------------\n")
         print(a2+" = ", end="")
-        strR=str(a2)+" = "
+        strR = str(a2)+" = "
         for i in range(len(descomposicion)-1):
             print(descomposicion[i]+" * ", end="")
             strR += str(descomposicion[i])+" * "
@@ -151,7 +150,8 @@ def Decompose():
 
 
 def BaseChangeGeneralAlgorythm():
-    number = AuxIterateRequestData("Ingresa el número a cambiar de base: ")
+    number = AuxIterateRequestData(
+        "Ingresa el número a cambiar de base: ", mayus=True)
     if number == -1:
         return -1
     numberRes = number
@@ -175,13 +175,15 @@ def BaseChangeGeneralAlgorythm():
 
 
 def Sum():
-    cant = AuxIterateRequestData("Ingrese la cantidad de numeros a sumar: ")
+    cant = AuxIterateRequestData(
+        "Ingrese la cantidad de numeros a sumar: ", mayus=True)
     if cant == -1:
         return -1
     cant = int(cant)
     numbers = []
     for i in range(cant):
-        number = AuxIterateRequestData("Ingrese el numero "+str(i+1)+": ")
+        number = AuxIterateRequestData(
+            "Ingrese el numero "+str(i+1)+": ", mayus=True)
         if number == -1:
             return -1
         numbers.append(number)
@@ -189,8 +191,44 @@ def Sum():
     if base == -1:
         return -1
     base = int(base)
-    suma, strR=SumNumbers(numbers, base)
+    suma, strR = SumNumbers(numbers, base)
     print("\nSuma de los numeros:\n"+suma)
+    return strR
+
+
+def Sub():
+    minu = AuxIterateRequestData(
+        " A <-- Ingrese el minuendo: ", "\n-B\n--\n C", True)
+    if minu == -1:
+        return -1
+    sus = AuxIterateRequestData(
+        " A = "+str(minu)+"\n-B <-- Ingrese el sustraendo: ", "\n--\n C", True)
+    if sus == -1:
+        return -1
+    base = AuxIterateRequestData("Ingrese la base de los numeros: ")
+    if base == -1:
+        return -1
+    base = int(base)
+    resta, strR = SubtractNumbers([str(minu), str(sus)], base)
+    print("\nResta de los numeros:\n" + resta)
+    return strR
+
+
+def Mult():
+    termA = AuxIterateRequestData(
+        "Ingrese el factor 1: ", mayus=True)
+    if termA == -1:
+        return -1
+    termA = int(termA)
+    termB = AuxIterateRequestData("Ingrese el factor 2: ", mayus=True)
+    if termB == -1:
+        return -1
+    base = AuxIterateRequestData("Ingrese la base de los numeros: ")
+    if base == -1:
+        return -1
+    base = int(base)
+    multiplicacion, strR = MultiplyNumbers([str(termA), str(termB)], base)
+    print("\nMultiplicacion de los numeros:\n" + multiplicacion)
     return strR
 
 

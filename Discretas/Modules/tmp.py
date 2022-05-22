@@ -1,62 +1,69 @@
 from AuxFunctions import *
 
 
-def SumNumbers(lst, base):
+def MultiplyNumbers(lst, base):
     if base < 2:
         return -3
-    lst.sort(key=len, reverse=True)
+    if len(lst[0]) < len(lst[1]):
+        lst[0], lst[1] = lst[1], lst[0]
     maxL = len(lst[0])
-    resd = 0
-    sobr = 0
+    sums = []
     res = []
-    strResd=[]
-    cantRes=0
-    minCant=maxL+1
-    for i in range(maxL):
-        sum = 0
-        sum += resd
-        for j in range(len(lst)):
-            if len(lst[j])-(i+1) >= 0:
-                tmp = NumInBaseXToBaseTen(lst[j][len(lst[j])-(i+1)])
-                if tmp == -3:
-                    return -3
-                sum += int(tmp)
-        resd = int(sum/base)
+    strResd = []
+    for i in range(len(lst[1])):
+        mult = 0
+        resd = 0
+        strResd.append([])
+        sums.append([])
+        termB = NumInBaseXToBaseTen(lst[1][len(lst[1])-(i+1)])
+        if termB == -3:
+            return -3
+        termB = int(termB)
+        for j in range(maxL):
+            termA = NumInBaseXToBaseTen(lst[0][len(lst[0])-(j+1)])
+            if termA == -3:
+                return -3
+            termA = int(termA)
+            mult = (termA*termB)+resd
+            sums[i].append(str(mult % base))
+            resd = mult//base
+            if resd != 0:
+                strResd[i].append(str(resd))
+            else:
+                strResd[i].append("")
         if resd != 0:
-            strResd.append(str(resd))
-        else:
-            strResd.append("")
-        sobr = sum % base
-        res.append(str(sobr))
-        cantRes += 1
-    while int(resd/base) > 0:
-        sobr = resd % base
-        res.append(str(sobr))
-        cantRes += 1
-        resd = int(resd/base)
-        if resd != 0:
-            strResd.append(str(resd))
-        else:
-            strResd.append("")
-    if resd != 0:
-        res.append(str(resd))
-        cantRes += 1
-    if cantRes < minCant:
-        cantRes=minCant
-    strResd=strResd[::-1]
-    strResd=NumInBaseTenToBaseX(strResd)
-    for i in range(len(lst)):
-        strResd+="\n"+" "*(cantRes-len(lst[i]))+lst[i]
-    strResd+="\n"+"-"*(cantRes)
-    res = res[::-1]
-    res = NumInBaseTenToBaseX(res)
-    strResd += "\n"+" "*(cantRes-len(res))+res
-    print(strResd)
+            sums[i].append(str(resd))
+    maxSL=0
+    for i in range(len(sums)):
+        sums[i] = NumInBaseTenToBaseX(sums[i], True)
+        sums[i] += " "*i
+        if len(sums[i]) > maxSL:
+            maxSL = len(sums[i])
+    maxRL=0
+    for i in range(len(strResd)):
+        strResd[i] = NumInBaseTenToBaseX(strResd[i], True)
+        strResd[i] += " "
+        strResd[i] = ObtainSub(strResd[i], False)
+        if len(strResd[i]) > maxRL:
+            maxRL = len(strResd[i])
+    maxT=max(maxSL, maxRL, maxL)
+    strRes = ""
+    j=0
+    for i in range(len(strResd)-1, -1, -1):
+        strRes += " "*(maxT-len(strResd[i]))+strResd[i] + \
+            " <- residuos del termino \""+lst[1][j]+"\"\n"
+        j+=1
+    strRes += " "*(maxT-maxL)+lst[0] + ObtainSub(base) + "\n"
+    strRes += " "*(maxT-len(lst[1]))+lst[1] + ObtainSub(base)+"\n"
+    strRes += "-"*(maxT)+"\n"
+    strRes2, res=SumNumbers(sums, base, True)
+    if res == -3:
+        return -3
+    strRes += strRes2
+    return strRes, res
 
 
 if __name__ == "__main__":
-    SumNumbers(["34243","42342","44324","34214","34213"],5)
-    # SumNumbers(["34243","4234","443","34","3"],5)
-    # SumNumbers(["57A2", "8B26", "7A57", "BABA"], 13)
-    # SumNumbers(["2222","1"], 13)
-    # SumNumbers(["2313","1324"], 5)
+    resul, resRet = MultiplyNumbers(["D040", "AA"], 16)
+    print(resul, resRet)
+    pass
