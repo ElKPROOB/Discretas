@@ -65,6 +65,8 @@ def Execute(Id):
         strR = Sub()
     elif Id == "09":
         strR = Mult()
+    elif Id == "10":
+        strR = Div()
     if type(strR) == str:
         clp.copy(strR)
         print("\nResultado copiado al portapapeles\n\n")

@@ -1,69 +1,85 @@
 from AuxFunctions import *
 
 
-def MultiplyNumbers(lst, base):
-    if base < 2:
-        return -3
-    if len(lst[0]) < len(lst[1]):
-        lst[0], lst[1] = lst[1], lst[0]
-    maxL = len(lst[0])
-    sums = []
-    res = []
-    strResd = []
-    for i in range(len(lst[1])):
-        mult = 0
-        resd = 0
-        strResd.append([])
-        sums.append([])
-        termB = NumInBaseXToBaseTen(lst[1][len(lst[1])-(i+1)])
-        if termB == -3:
-            return -3
-        termB = int(termB)
-        for j in range(maxL):
-            termA = NumInBaseXToBaseTen(lst[0][len(lst[0])-(j+1)])
-            if termA == -3:
-                return -3
-            termA = int(termA)
-            mult = (termA*termB)+resd
-            sums[i].append(str(mult % base))
-            resd = mult//base
-            if resd != 0:
-                strResd[i].append(str(resd))
+def SimpleDivision(lst, base):
+    lst = lst[::-1]
+    resul = 0
+    resulResd = "0"
+    sumando = lst[1]
+    ignore, resulRes = SubtractNumbers(lst, base)
+    while(resulRes[0] != '-'):
+        resulResd = resulRes
+        resul += 1
+        ignore, lst[1] = SumNumbers([lst[1], sumando], base)
+        ignore, resulRes = SubtractNumbers(lst, base)
+    ignore, resul = BaseChangeAlgorythm(resul, base)
+    resd = ""
+    ceroI = True
+    for i in range(len(resulResd)):
+        if resulResd[i] == '0':
+            if ceroI:
+                continue
             else:
-                strResd[i].append("")
-        if resd != 0:
-            sums[i].append(str(resd))
-    maxSL=0
-    for i in range(len(sums)):
-        sums[i] = NumInBaseTenToBaseX(sums[i], True)
-        sums[i] += " "*i
-        if len(sums[i]) > maxSL:
-            maxSL = len(sums[i])
-    maxRL=0
-    for i in range(len(strResd)):
-        strResd[i] = NumInBaseTenToBaseX(strResd[i], True)
-        strResd[i] += " "
-        strResd[i] = ObtainSub(strResd[i], False)
-        if len(strResd[i]) > maxRL:
-            maxRL = len(strResd[i])
-    maxT=max(maxSL, maxRL, maxL)
+                resd += '0'
+        else:
+            ceroI = False
+            resd += resulResd[i]
+    if resd == "":
+        resd = "0"
+    return resul, resd
+
+
+def DivideNumbers(lst, base):
+    divisor = lst[0]
+    dividendo = ""
+    lstCoc = []
+    strBase= ObtainSub(base)
     strRes = ""
-    j=0
-    for i in range(len(strResd)-1, -1, -1):
-        strRes += " "*(maxT-len(strResd[i]))+strResd[i] + \
-            " <- residuos del termino \""+lst[1][j]+"\"\n"
-        j+=1
-    strRes += " "*(maxT-maxL)+lst[0] + ObtainSub(base) + "\n"
-    strRes += " "*(maxT-len(lst[1]))+lst[1] + ObtainSub(base)+"\n"
-    strRes += "-"*(maxT)+"\n"
-    strRes2, res=SumNumbers(sums, base, True)
-    if res == -3:
-        return -3
-    strRes += strRes2
-    return strRes, res
+    strRes2 = ""
+    resd="0"
+    primDiv=False
+    for i in range(len(lst[1])):
+        dividendo += lst[1][i]
+        cociente, ignore = SimpleDivision([divisor, dividendo], base)
+        if cociente == "0" and primDiv==False:
+            lstCoc.append(" ")
+        else:
+            if primDiv:
+                strRes2 += dividendo+"\n"
+            else:
+                primDiv = True
+            lstCoc.append(cociente)
+            ignore, resulMult = MultiplyNumbers([cociente, divisor], base)
+            strRes2 += " "*((len(divisor)+len(strBase)+1+i)-(len(resulMult)))+"-"+resulMult+"\n"
+            ignore, dividendo = SubtractNumbers([dividendo, resulMult], base)
+            strRes2 += "-"*(len(divisor)+len(strBase)+len(lst[1])+1)+"\n"
+            strRes2 += " "*((len(divisor)+len(strBase)+2+i)-(len(dividendo)))
+            if i == len(lst[1])-1:
+                resd = ""
+                ceroI = True
+                for i in range(len(dividendo)):
+                    if dividendo[i] == '0':
+                        if ceroI:
+                            resd+=' '
+                        else:
+                            resd += '0'
+                    else:
+                        ceroI = False
+                        resd += dividendo[i]
+                if resd == (" "*len(resd)):
+                    resd = resd[:-1]+"0"
+                strRes2 += resd
+    strRes = " "*(len(divisor)+1+len(strBase)) + "".join(lstCoc) + strBase + "\n" + " " * (len(divisor)+1+len(strBase)) + "_"*len(lst[1]) + "\n" + divisor + strBase + "|" + lst[1] + strBase + "\n"+strRes2+" <- residuo"
+    resd = "Cociente: " + "".join(lstCoc)  + " Residuo: " + resd.replace(" ", "")
+    return strRes, resd
 
 
 if __name__ == "__main__":
-    resul, resRet = MultiplyNumbers(["D040", "AA"], 16)
-    print(resul, resRet)
+    # resul, resRet = MultiplyNumbers(["D040", "AA"], 16)
+    # print(resul, resRet)
+    # res, resd = SimpleDivision(["2", "4563"], 7)
+    # print(res, resd)
+    res, resd = DivideNumbers(["42", "60322"], 8)
+    #res, resd=SimpleDivision(["10", "11001100"], 2)
+    print(res+"\n"+ resd)
     pass

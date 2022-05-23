@@ -168,7 +168,8 @@ def BaseChangeGeneralAlgorythm():
         numberRes = BaseChangeToTenAlgorythm(numberRes, int(base))
     if base2 != "10":
         print("\nConversión de base 10 a base "+str(base2)+":\n")
-        numberRes = BaseChangeAlgorythm(numberRes, int(base2))
+        StrRes, numberRes = BaseChangeAlgorythm(numberRes, int(base2))
+        print("\n"+StrRes+"\n")
     print("\n")
     print(str(number)+ObtainSub(base)+" = "+str(numberRes)+ObtainSub(base2))
     return str(numberRes)
@@ -219,7 +220,6 @@ def Mult():
         "Ingrese el factor 1: ", mayus=True)
     if termA == -1:
         return -1
-    termA = int(termA)
     termB = AuxIterateRequestData("Ingrese el factor 2: ", mayus=True)
     if termB == -1:
         return -1
@@ -229,6 +229,24 @@ def Mult():
     base = int(base)
     multiplicacion, strR = MultiplyNumbers([str(termA), str(termB)], base)
     print("\nMultiplicacion de los numeros:\n" + multiplicacion)
+    return strR
+
+
+def Div():
+    divid = AuxIterateRequestData(
+        "A <-- Ingrese el Dividendo: ", "\n-\nB", True)
+    if divid == -1:
+        return -1
+    divis = AuxIterateRequestData(
+        "A = "+str(divid)+"\n-\nB <-- Ingrese el Divisor: ", mayus=True)
+    if divis == -1:
+        return -1
+    base = AuxIterateRequestData("Ingrese la base de los numeros: ")
+    if base == -1:
+        return -1
+    base = int(base)
+    division, strR = DivideNumbers([str(divis), str(divid)], base)
+    print("\nDivision de los numeros:\n" + division)
     return strR
 
 

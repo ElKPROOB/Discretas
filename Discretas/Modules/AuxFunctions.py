@@ -188,7 +188,7 @@ def ObtainSub(number, parenthesis=True):
     for i in str(number):
         if i == ' ':
             base += ' '
-        elif ord(i)>=65 and ord(i)<=90:
+        elif ord(i) >= 65 and ord(i) <= 90:
             base += i
         else:
             base += '{}'.format(chr(0x2080+int(i)))
@@ -206,7 +206,7 @@ def ObtainSup(number):
             base += '{}'.format(chr(0x00B9))
         elif i == ' ':
             base += ' '
-        elif ord(i)>=65 and ord(i)<=90:
+        elif ord(i) >= 65 and ord(i) <= 90:
             base += i
         else:
             base += '{}'.format(chr(0x00B0+int(i)))
@@ -241,6 +241,7 @@ def BaseChangeToTenAlgorythm(number, base):
 def BaseChangeAlgorythm(number, base):
     q = 1
     res = []
+    strRes = ""
     number = int(number)
     number2 = number
     nL = len(str(number))
@@ -250,19 +251,18 @@ def BaseChangeAlgorythm(number, base):
         r = number - base * q
         if r >= 10:
             r = chr(55+r)
-        print(str(number)+" "*(nL-len(str(number))) + " = " + str(base) +
-              "(" + str(q) + ")"+" "*(qL-len(str(q))) + " + " + str(r))
+        strRes += str(number)+" "*(nL-len(str(number))) + " = " + str(base) + \
+            "(" + str(q) + ")"+" "*(qL-len(str(q))) + " + " + str(r)+"\n"
         number = q
         res.append(r)
     j = 1
     res = res[::-1]
-    print(str(number2)+ObtainSub(10)+" = ", end="")
+    strRes+=str(number2)+ObtainSub(10)+" = "
     finalNum = ""
     for i in res:
         finalNum += str(i)
-    print(finalNum, end="")
-    print(ObtainSub(base))
-    return finalNum
+    strRes+=finalNum+ObtainSub(base)
+    return strRes, finalNum
 
 
 def NumInBaseXToBaseTen(chr):
@@ -296,7 +296,7 @@ def SumNumbers(lst, base, productSum=False):
     if base < 2:
         return -3
     if productSum:
-        lstTmp=lst.copy()
+        lstTmp = lst.copy()
     lst.sort(key=len, reverse=True)
     maxL = len(lst[0])
     resd = 0
@@ -340,7 +340,7 @@ def SumNumbers(lst, base, productSum=False):
     strResd = NumInBaseTenToBaseX(strResd)
     strResd = ObtainSub(strResd, False)
     if productSum:
-        lst=lstTmp
+        lst = lstTmp
     for i in range(len(lst)):
         strResd += "\n"+" "*(cantRes-len(lst[i]))+lst[i]+ObtainSub(base)
     strResd += "\n"+"-"*(cantRes)
@@ -418,7 +418,7 @@ def SubtractNumbers(lst, base, negative=False):
     strRes += res2
     if negative:
         strRes += " Debido a que Num1<Num2, se invirtieron los terminos, por lo que la resta es: -" + res2
-        res="-"+res
+        res = "-"+res
     return strRes, res
 
 
@@ -454,31 +454,104 @@ def MultiplyNumbers(lst, base):
                 strResd[i].append("")
         if resd != 0:
             sums[i].append(str(resd))
-    maxSL=0
+    maxSL = 0
     for i in range(len(sums)):
         sums[i] = NumInBaseTenToBaseX(sums[i], True)
         sums[i] += " "*i
         if len(sums[i]) > maxSL:
             maxSL = len(sums[i])
-    maxRL=0
+    maxRL = 0
     for i in range(len(strResd)):
         strResd[i] = NumInBaseTenToBaseX(strResd[i], True)
         strResd[i] += " "
         strResd[i] = ObtainSub(strResd[i], False)
         if len(strResd[i]) > maxRL:
             maxRL = len(strResd[i])
-    maxT=max(maxSL, maxRL, maxL)
+    maxT = max(maxSL, maxRL, maxL)
     strRes = ""
-    j=0
+    j = 0
     for i in range(len(strResd)-1, -1, -1):
         strRes += " "*(maxT-len(strResd[i]))+strResd[i] + \
             " <- residuos del termino \""+lst[1][j]+"\"\n"
-        j+=1
+        j += 1
     strRes += " "*(maxT-maxL)+lst[0] + ObtainSub(base) + "\n"
     strRes += " "*(maxT-len(lst[1]))+lst[1] + ObtainSub(base)+"\n"
     strRes += "-"*(maxT)+"\n"
-    strRes2, res=SumNumbers(sums, base, True)
+    strRes2, res = SumNumbers(sums, base, True)
     if res == -3:
         return -3
     strRes += strRes2
     return strRes, res
+
+
+def SimpleDivision(lst, base):
+    lst = lst[::-1]
+    resul = 0
+    resulResd = "0"
+    sumando = lst[1]
+    ignore, resulRes = SubtractNumbers(lst, base)
+    while(resulRes[0] != '-'):
+        resulResd = resulRes
+        resul += 1
+        ignore, lst[1] = SumNumbers([lst[1], sumando], base)
+        ignore, resulRes = SubtractNumbers(lst, base)
+    ignore, resul = BaseChangeAlgorythm(resul, base)
+    resd = ""
+    ceroI = True
+    for i in range(len(resulResd)):
+        if resulResd[i] == '0':
+            if ceroI:
+                continue
+            else:
+                resd += '0'
+        else:
+            ceroI = False
+            resd += resulResd[i]
+    if resd == "":
+        resd = "0"
+    return resul, resd
+
+
+def DivideNumbers(lst, base):
+    divisor = lst[0]
+    dividendo = ""
+    lstCoc = []
+    strBase= ObtainSub(base)
+    strRes = ""
+    strRes2 = ""
+    resd="0"
+    primDiv=False
+    for i in range(len(lst[1])):
+        dividendo += lst[1][i]
+        cociente, ignore = SimpleDivision([divisor, dividendo], base)
+        if cociente == "0" and primDiv==False:
+            lstCoc.append(" ")
+        else:
+            if primDiv:
+                strRes2 += dividendo+"\n"
+            else:
+                primDiv = True
+            lstCoc.append(cociente)
+            ignore, resulMult = MultiplyNumbers([cociente, divisor], base)
+            strRes2 += " "*((len(divisor)+len(strBase)+1+i)-(len(resulMult)))+"-"+resulMult+"\n"
+            ignore, dividendo = SubtractNumbers([dividendo, resulMult], base)
+            strRes2 += "-"*(len(divisor)+len(strBase)+len(lst[1])+1)+"\n"
+            strRes2 += " "*((len(divisor)+len(strBase)+2+i)-(len(dividendo)))
+            if i == len(lst[1])-1:
+                resd = ""
+                ceroI = True
+                for i in range(len(dividendo)):
+                    if dividendo[i] == '0':
+                        if ceroI:
+                            resd+=' '
+                        else:
+                            resd += '0'
+                    else:
+                        ceroI = False
+                        resd += dividendo[i]
+                if resd == (" "*len(resd)):
+                    resd = resd[:-1]+"0"
+                strRes2 += resd
+    strRes = " "*(len(divisor)+1+len(strBase)) + "".join(lstCoc) + strBase + "\n" + " " * (len(divisor)+1+len(strBase)) + "_"*len(lst[1]) + "\n" + divisor + strBase + "|" + lst[1] + strBase + "\n"+strRes2+" <- residuo"
+    resd = "Cociente: " + "".join(lstCoc)  + " Residuo: " + resd.replace(" ", "")
+    return strRes, resd

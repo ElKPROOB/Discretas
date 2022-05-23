@@ -8,3 +8,4 @@
 "07"; Suma de numeros en otra base; "A(x) + B(x) = C(x)"; Devuelve la suma de N numeros dados en base x.
 "08"; Resta de numeros en otra base; "A(x) - B(x) = C(x)"; Devuelve la resta de dos numeros dados en base x.
 "09"; Multiplicacion de numeros en otra base; "A(x) * B(x) = C(x)"; Devuelve la multiplicacion de dos numeros dados en base x.
+"10"; Division de numeros en otra base; "A(x) / B(x) = C(x)"; Devuelve la division de dos numeros dados en base x.
