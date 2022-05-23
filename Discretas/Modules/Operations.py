@@ -247,6 +247,9 @@ def Div():
     base = int(base)
     division, strR = DivideNumbers([str(divis), str(divid)], base)
     print("\nDivision de los numeros:\n" + division)
+    cocComp, resComp = SimpleDivision([str(divis), str(divid)], base)
+    print("\nResultados de la Comprobacion:\nCociente: " +
+          cocComp+"\nResiduo: "+resComp)
     return strR
 
 
